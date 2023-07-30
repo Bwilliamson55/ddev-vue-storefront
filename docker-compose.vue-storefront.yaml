@@ -1,0 +1,37 @@
+#ddev-generated
+# Simple template to demonstrate vue-storefront
+services:
+  vue-storefront:
+    container_name: ddev-${DDEV_SITENAME}-vsf
+    hostname: ${DDEV_SITENAME}-vsf
+    build:
+      context: .
+      dockerfile: ./vsf/Dockerfile
+    networks: [default, ddev_default]
+    environment:
+      - VIRTUAL_HOST=vsf.mishi-m2.ddev.site
+      - HTTPS_EXPOSE=443:3000
+      - HTTP_EXPOSE=80:3000
+      - NODE_CONFIG_ENV=docker
+      - NODE_ENV=development
+      - VS_ENV=development
+      - BIND_HOST=0.0.0.0
+      - PM2_ARGS=--no-daemon
+      - VSF_PATH=/home/bwilliamson/dev/vue/mishi-vue
+    restart: "always"
+    expose:
+      - "3000"
+    # These labels ensure this service is discoverable by ddev.
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    depends_on:
+      - web
+    links:
+      - web
+    # Allow http API calls from vsf to the web container
+    external_links:
+      - "ddev-router:mishi-m2.ddev.site"
+    volumes:
+    - ".:/mnt/ddev_config"
+    - "${VSF_PATH}:/var/www"
